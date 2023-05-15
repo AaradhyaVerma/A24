@@ -31,3 +31,4 @@ instruction_code={'add':0,
          'jgt':17,
          'je':18,
          'hlt':19}
+
