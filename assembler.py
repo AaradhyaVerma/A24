@@ -503,7 +503,7 @@ def halt_print(instruction):
     print_machine_code = opcodestr + "00000000000"
     # print(print_machine_code)
     return print_machine_code
-
+boolvarallowed = 0
 
 #reading input from test.txt
 f = open("test.txt",'r')
@@ -511,12 +511,21 @@ f = open("test.txt",'r')
 fout = open("out.txt",'a')
 haltcount = 0
 count = 0
+addrcount = 0
+varcount = 0
+for line in f:
+    ins = line.split()
+    if ins[0] in instruction_code or ins[0] == 'mov':
+        addrcount += 1
+f.close()
+f = open("test.txt",'r')
 for line in f:
     count += 1
     ins = line
     temp = line.split()
     if 'var' in temp:
-        s = insert_var_in_dict(ins,count)
+        s = insert_var_in_dict(ins,addrcount)
+        addrcount+=1 
         if s == "NULL":
             pass
         else:
@@ -611,6 +620,6 @@ for line in f:
         haltcount += 1
         s = halt_print(ins)
         s += '\n'
-        fout.write(s)    
+        fout.write(s)   
 f.close()
 fout.close()
