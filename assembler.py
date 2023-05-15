@@ -54,11 +54,16 @@ types = {'add':"A",
          'je':"E",
          'hlt':"F"}
 
-var_dict = {}
+var_lst = []
 #function for inserting vars in dict which takes line number, name as input
-def insert_var_in_dict(name,line_num):
-    global var_dict
-    var_dict[name] = returnbin(line_num,16)
+def insert_var_in_dict(instruction):
+    global var_lst
+    templst = instruction.split()
+    if len(templst) != 2:
+        s = "number of args not valid"
+        return s
+    var_lst.append(templst[1])
+    return "NULL"
 
 def validity_check_opcode(opcode):
     global instruction_code
@@ -504,17 +509,27 @@ def halt_print(instruction):
 f = open("test.txt",'r')
 #opening out.txt
 fout = open("out.txt",'a')
-fout.write("ASSEMBLY OUTPUT\n")
 haltcount = 0
 for line in f:
     ins = line
+    temp = line.split()
+    if 'var' in temp:
+        s = insert_var_in_dict(ins)
+        if s == "NULL":
+            pass
+        else:
+            s += '\n'
+            fout.write(s)
+            break
     if haltcount != 0 and ins != '':
         fout.write("Halt found in the middle of instructions, program terminated\n")
         break
     command = ins.split()[0]
+
     if 'FLAGS' in ins.split() and command != 'mov':
         fout.write("Invalid Usage of Flags with instruction other than move\n")
         break
+
     if command == 'add':
         s = add_print(ins)
         s += '\n'
