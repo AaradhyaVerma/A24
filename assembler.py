@@ -489,10 +489,12 @@ def je_print(instruction):
     return print_machine_code
 
 def halt_print(instruction):
+    instruction = instruction.strip()
     global instruction_code
     # Checking validity
     # assert validity_check_opcode(instruction) == True, "invalid opcode"
     if validity_check_opcode(instruction) == False:
+        print("reached")
         s = "Invalid opcode"
         return s
     # assert len(instruction.split()) == 1, "number of args in halt instruction is invalid"
@@ -529,7 +531,7 @@ for line in f:
             s += '\n'
             fout.write(s)
             break
-        
+
         s = insert_var_in_dict(ins,addrcount)
         addrcount+=1 
         if s == "NULL":
