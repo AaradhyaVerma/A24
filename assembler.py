@@ -137,6 +137,17 @@ def move_register(instruction):
     final_inst = returnbin(instruction_code['mov_reg'], 5) + "00000" + dest_reg_bin + src_reg_bin
     print(final_inst)
 
+def ld_print(instruction):
+    global instruction_code
+    temp_lst = instruction.split()
+    assert len(temp_lst) == 3, "number of arguments in load instruction is invalid"
+    assert validity_check_opcode(temp_lst[0]) == True, "instruction is invalid"
+    assert validity_check_register(temp_lst[1]) == True, "register is invalid"
+    assert validity_check_mem_address(temp_lst[2]) == True, "memory address is invalid"
+    opcode_str = returnbin(instruction_code['ld'],5)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
+    print(print_machine_code)
+
 def mul_print(instruction):
     global instruction_code 
     #checking validity
@@ -247,6 +258,30 @@ def je_print(instruction):
     opcodestr = returnbin(instruction_code['je'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
     print(printable)
+
+def jlt_print(instruction):
+    global instruction_code
+    temp_lst = instruction.split()
+    assert len(temp_lst) == 2, "number of arguments in load instruction is invalid"
+    assert validity_check_opcode(temp_lst[0]) == True, "Invalid instruction"
+    assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
+    opcode_str = returnbin(instruction_code['jlt'],5)
+    print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
+    print(print_machine_code)
+
+def rs_print(instruction):
+    global instruction_code
+    temp_lst = instruction.split()
+    temp_lst[2] = temp_lst[2][1:]
+    assert len(temp_lst) == 3, "number of arguments in load instruction is invalid"
+    assert validity_check_opcode(temp_lst[0]) == True, "Invalid instruction code"
+    assert validity_check_register(temp_lst[1]) == True, "Invalid register"
+    # assert validity_check_imm(temp_lst[2]) == True, "Invalid immediate"
+    imm = int(temp_lst[2])
+    assert imm >= 0 and imm <= 127, "Immediate value out of range"
+    opcode_str = returnbin(instruction_code['rs'],5)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(imm, 7)
+    print(print_machine_code)
 
 def halt_print(instruction):
     global instruction_code
