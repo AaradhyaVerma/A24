@@ -66,6 +66,13 @@ def validity_check_opcode(opcode):
         return True
     else:
         return False
+    
+def validity_check_register(register):
+    global instruction_code
+    if register in reg_bin:
+        return True
+    else:
+        return False
 
 def sub_print(instruction):
     global instruction_code 
