@@ -403,9 +403,18 @@ def compare_print(instruction):
 def unconditional_jump(instruction):
     global instruction_code
     lst = instruction.split()
-    assert len(lst) == 2, "number of arguments in instruction is invalid"
-    assert validity_check_opcode(lst[0]) == True, "Invalid instruction"
-    assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
+    # assert len(lst) == 2, "number of arguments in instruction is invalid"
+    if len(lst) != 2:
+        s = "number of arguments in instruction is invalid"
+        return s
+    # assert validity_check_opcode(lst[0]) == True, "Invalid instruction"
+    if validity_check_opcode(lst[0]) == False:
+        s = "Invalid instruction"
+        return s
+    # assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
+    if validity_check_mem_address(lst[1]) == False:
+        s = "Invalid memory address"
+        return s
     final_inst = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
     # print(final_inst)
     return final_inst
@@ -413,9 +422,18 @@ def unconditional_jump(instruction):
 def jlt_print(instruction):
     global instruction_code
     temp_lst = instruction.split()
-    assert len(temp_lst) == 2, "number of arguments in load instruction is invalid"
-    assert validity_check_opcode(temp_lst[0]) == True, "Invalid instruction"
-    assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
+    # assert len(temp_lst) == 2, "number of arguments in load instruction is invalid"
+    if len(temp_lst) != 2:
+        s = "number of arguments in load instruction is invalid"
+        return s
+    # assert validity_check_opcode(temp_lst[0]) == True, "Invalid instruction"
+    if validity_check_opcode(temp_lst[0]) == False:
+        s = "Invalid instruction"
+        return s
+    # assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
+    if validity_check_mem_address(temp_lst[1]) == False:
+        s = "Invalid memory address"
+        return s
     opcode_str = returnbin(instruction_code['jlt'],5)
     print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
     # print(print_machine_code)
@@ -425,10 +443,19 @@ def jgt_print(instruction):
     global instruction_code
     # Checking validity
     templst = instruction.split()
-    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
-    assert len(templst) == 2, "number of args in jump if equal instruction is invalid"
+    # assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    if validity_check_opcode(templst[0]) == False:
+        s = "invalid opcode"
+        return s
+    # assert len(templst) == 2, "number of args in jump if equal instruction is invalid"
+    if len(templst) != 2:
+        s = "number of args in jump if equal instruction is invalid"
+        return s
     mem_addr = templst[1]
-    assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
+    # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
+    if validity_check_mem_address(mem_addr) == False:
+        s = "invalid memory address"
+        return s
     opcodestr = returnbin(instruction_code['jgt'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
     # print(printable)
@@ -438,10 +465,19 @@ def je_print(instruction):
     global instruction_code
     # Checking validity
     templst = instruction.split()
-    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
-    assert len(templst) == 2, "number of args in jump if equal instruction is invalid"
+    # assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    if validity_check_opcode(templst[0]) == False:
+        s = "invalid opcode"
+        return s
+    # assert len(templst) == 2, "number of args in jump if equal instruction is invalid"
+    if len(templst) != 2:
+        s = "number of args in jump if equal instruction is invalid"
+        return s
     mem_addr = templst[1]
-    assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
+    # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
+    if validity_check_mem_address(mem_addr) == False:
+        s = "invalid memory address"
+        return s
     opcodestr = returnbin(instruction_code['je'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
     # print(printable)
@@ -450,8 +486,14 @@ def je_print(instruction):
 def halt_print(instruction):
     global instruction_code
     # Checking validity
-    assert validity_check_opcode(instruction) == True, "invalid opcode"
-    assert len(instruction.split()) == 1, "number of args in halt instruction is invalid"
+    # assert validity_check_opcode(instruction) == True, "invalid opcode"
+    if validity_check_opcode(instruction) == False:
+        s = "invalid opcode"
+        return s
+    # assert len(instruction.split()) == 1, "number of args in halt instruction is invalid"
+    if len(instruction.split()) != 1:
+            s = "number of args in halt instruction is invalid"
+            return s
     opcodestr = returnbin(instruction_code['hlt'], 5)
     printable = opcodestr + "00000000000"
     # print(printable)
