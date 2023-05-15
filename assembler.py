@@ -1,5 +1,5 @@
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6}
-mem_bin = []
+mem_bin = {}
 
 #creating a decimal to binary converter which takes the decimal and the number of bits as input
 def returnbin(num,bits):
@@ -56,13 +56,13 @@ types = {'add':"A",
 
 
 #function for inserting vars in dict which takes line number, name as input
-def insert_var_in_dict(instruction):
+def insert_var_in_dict(instruction, linecount):
     global mem_bin
     templst = instruction.split()
     if len(templst) != 2:
         s = "number of args not valid"
         return s
-    mem_bin.append(templst[1])
+    mem_bin[templst[1]] = linecount
     return "NULL"
 
 def validity_check_opcode(opcode):
@@ -510,7 +510,9 @@ f = open("test.txt",'r')
 #opening out.txt
 fout = open("out.txt",'a')
 haltcount = 0
+count = 0
 for line in f:
+    count += 1
     ins = line
     temp = line.split()
     if 'var' in temp:
