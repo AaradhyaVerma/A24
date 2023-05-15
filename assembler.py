@@ -68,7 +68,7 @@ def validity_check_opcode(opcode):
         return False
     
 def validity_check_register(register):
-    global instruction_code
+    global reg_bin
     if register in reg_bin:
         return True
     else:
