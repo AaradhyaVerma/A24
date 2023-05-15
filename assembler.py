@@ -517,7 +517,7 @@ count = 0
 addrcount = 0
 varcount = 0
 for line in f:
-    if ins == "" :
+    if line == "" :
         pass
     else:
         ins = line.split()
@@ -540,7 +540,8 @@ for line in f:
         i += 1
         while(line[i] != '\n'):
             newins += line[i]
-        newins = ins[:]
+            i += 1
+        ins = newins[:]
     if 'var' in temp:
         if(boolvarallowed == 0):
             s = "Var at inappropriate place"
