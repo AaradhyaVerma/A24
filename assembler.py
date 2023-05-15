@@ -123,6 +123,20 @@ def move_immediate(instruction):
     printable = opcodestr +"0"+ returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 7)
     print(printable)
 
+def move_register(instruction):
+    global instruction_code
+    lst = instruction.split()
+    assert (validity_check_opcode(lst[0]) == True), "Invalid instruction"
+    assert len(lst) == 3, "number of arguments in move registers instruction is invalid"
+    for i in range(1,3):
+        assert validity_check_register(lst[i]) == True, "format of registers is invalid"
+    dest_reg = reg_bin.get(lst[1])
+    src_reg = reg_bin.get(lst[2])
+    dest_reg_bin = returnbin(dest_reg, 3)
+    src_reg_bin = returnbin(src_reg, 3)
+    final_inst = returnbin(instruction_code['mov_reg'], 5) + "00000" + dest_reg_bin + src_reg_bin
+    print(final_inst)
+
 def mul_print(instruction):
     global instruction_code 
     #checking validity
@@ -138,6 +152,20 @@ def mul_print(instruction):
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
     print(printable)
 
+def divide(instruction):
+    global instruction_code
+    lst = instruction.split()
+    assert (validity_check_opcode(lst[0]) == True), "Invalid instruction"
+    assert len(lst) == 3, "number of arguments in division instruction is invalid"
+    for i in range(1,3):
+        assert validity_check_register(lst[i]) == True, "format of registers is invalid"
+    dest_reg = reg_bin.get(lst[1])
+    src_reg = reg_bin.get(lst[2])
+    dest_reg_bin = returnbin(dest_reg, 3)
+    src_reg_bin = returnbin(src_reg, 3)
+    final_inst = returnbin(instruction_code['div'], 5) + "00000" + dest_reg_bin + src_reg_bin
+    print(final_inst)
+
 def xor_print(instruction):
     global instruction_code 
     #checking validity
@@ -152,6 +180,25 @@ def xor_print(instruction):
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
     print(printable)
+
+def Or(instruction):
+    global instruction_code
+    lst = instruction.split()
+    assert (validity_check_opcode(lst[0]) == True), "Invalid instruction"
+    assert len(lst) == 4, "number of arguments in or instruction is invalid"
+    for i in range(1,4):
+        assert validity_check_register(lst[i]) == True, "format of registers is invalid"
+
+    dest_reg = reg_bin.get(lst[1])
+    src_reg1 = reg_bin.get(lst[2])
+    src_reg2 = reg_bin.get(lst[3])
+
+    dest_reg_bin = returnbin(dest_reg, 3)
+    src_reg1_bin = returnbin(src_reg1, 3)
+    src_reg2_bin = returnbin(src_reg2, 3)
+
+    final_inst = returnbin(instruction_code['or'], 5) + "00" + dest_reg_bin + src_reg1_bin + src_reg2_bin
+    print(final_inst)
 
 def and_print(instruction):
     global instruction_code
@@ -179,6 +226,15 @@ def compare_print(instruction):
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00000" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)
     print(printable)
+
+def unconditional_jump(instruction):
+    global instruction_code
+    lst = instruction.split()
+    assert len(lst) == 2, "number of arguments in instruction is invalid"
+    assert validity_check_opcode(lst[0]) == True, "Invalid instruction"
+    assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
+    final_inst = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
+    print(final_inst)
 
 def je_print(instruction):
     global instruction_code
