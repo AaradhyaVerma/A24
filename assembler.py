@@ -418,8 +418,8 @@ def unconditional_jump(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
-    if validity_check_mem_address(lst[1]) == False:
-        s = "Invalid memory address"
+    if lst[1] not in label_lst:
+        s = "Label not found"
         return s
     print_machine_code = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
     # print(print_machine_code)
@@ -437,8 +437,8 @@ def jlt_print(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
-    if validity_check_mem_address(temp_lst[1]) == False:
-        s = "Invalid memory address"
+    if temp_lst[1] not in label_lst:
+        s = "Label not found"
         return s
     opcode_str = returnbin(instruction_code['jlt'],5)
     print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
@@ -459,8 +459,8 @@ def jgt_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if validity_check_mem_address(mem_addr) == False:
-        s = "Invalid memory address"
+    if templst[1] not in label_lst:
+        s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['jgt'], 5)
     print_machine_code = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
@@ -481,8 +481,8 @@ def je_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if validity_check_mem_address(mem_addr) == False:
-        s = "Invalid memory address"
+    if templst[1] not in label_lst:
+        s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['je'], 5)
     print_machine_code = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
@@ -517,7 +517,7 @@ count = 0
 addrcount = 0
 varcount = 0
 for line in f:
-    if ins == "" :
+    if line == "" :
         pass
     else:
         ins = line.split()
@@ -540,7 +540,8 @@ for line in f:
         i += 1
         while(line[i] != '\n'):
             newins += line[i]
-        newins = ins[:]
+            i += 1
+        ins = newins[:]
     if 'var' in temp:
         if(boolvarallowed == 0):
             s = "Var at inappropriate place"
