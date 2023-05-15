@@ -503,7 +503,7 @@ def halt_print(instruction):
     print_machine_code = opcodestr + "00000000000"
     # print(print_machine_code)
     return print_machine_code
-boolvarallowed = 0
+boolvarallowed = 1
 
 #reading input from test.txt
 f = open("test.txt",'r')
@@ -524,6 +524,12 @@ for line in f:
     ins = line
     temp = line.split()
     if 'var' in temp:
+        if(boolvarallowed == 0):
+            s = "Var at inappropriate place"
+            s += '\n'
+            fout.write(s)
+            break
+        
         s = insert_var_in_dict(ins,addrcount)
         addrcount+=1 
         if s == "NULL":
@@ -532,6 +538,8 @@ for line in f:
             s += '\n'
             fout.write(s)
             break
+    else:
+        boolvarallowed = 0
     if haltcount != 0 and ins != '':
         fout.write("Halt found in the middle of instructions, program terminated\n")
         break
