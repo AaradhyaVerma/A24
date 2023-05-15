@@ -1,0 +1,2 @@
+ASSEMBLY OUTPUT
+Invalid instruction
