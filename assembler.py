@@ -78,7 +78,12 @@ def sub_print(instruction):
     global instruction_code 
     #checking validity
     templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
     assert len(templst) == 4, "number of args in subtract instruction is invalid"
+    j = 1
+    for i in range(3):
+        assert validity_check_register(templst[j]) == True, "invalid register"
+        j+=1
     opcodestr = returnbin(instruction_code['sub'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
