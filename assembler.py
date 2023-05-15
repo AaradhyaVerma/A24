@@ -10,8 +10,8 @@ def returnbin(num,bits):
         s = '0' + s
     return s
 
-#creating dicts for opcodes
-instruction_code={'add':0,
+# creating dicts for opcodes
+instruction_code = {'add':0,
          'sub':1,
          'mov_imm':2,
          'mov_reg':3,
@@ -31,3 +31,26 @@ instruction_code={'add':0,
          'jgt':17,
          'je':18,
          'hlt':19}
+
+# creating dicts for types
+types = {'add':"A",
+         'sub':"A",
+         'mov_imm':"B",
+         'mov_reg':"C",
+         'ld':"D",
+         'st':"D",
+         'mul':"A",
+         'div':"C",
+         'rs':"B",
+         'ls':"B",
+         'xor':"A",
+         'or':"A",
+         'and':"A",
+         'not':"C",
+         'cmp':"C",
+         'jmp':"E",
+         'jlt':"E",
+         'jgt':"E",
+         'je':"E",
+         'hlt':"F"}
+
