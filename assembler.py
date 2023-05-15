@@ -446,6 +446,7 @@ def jlt_print(instruction):
     return print_machine_code
 
 def jgt_print(instruction):
+    print(instruction)
     global instruction_code
     # Checking validity
     templst = instruction.split()
@@ -463,7 +464,7 @@ def jgt_print(instruction):
         s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['jgt'], 5)
-    print_machine_code = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
+    print_machine_code = opcodestr + "0000" + returnbin(7, 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -528,7 +529,7 @@ for line in f:
             i += 1
         label_lst.append(strtmp)
         i += 1
-        while(line[i] != '\n'):
+        while(line[i] != '\n' and not line[i]):
             newins += line[i]
             i += 1
         ins = newins[:]
@@ -553,7 +554,7 @@ for line in f:
             i += 1
         label_lst.append(strtmp)
         i += 1
-        while(line[i] != '\n'):
+        while(line[i] != '\n' ):
             newins += line[i]
             i += 1
         ins = newins[:]
