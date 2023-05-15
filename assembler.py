@@ -517,6 +517,21 @@ count = 0
 addrcount = 0
 varcount = 0
 for line in f:
+    ins = line
+    newins = ""
+    temp = line.split()
+    if ':' in line:
+        i = 0
+        strtmp = ""
+        while ins[i] != ':':
+            strtmp += ins[i]
+            i += 1
+        label_lst.append(strtmp)
+        i += 1
+        while(line[i] != '\n'):
+            newins += line[i]
+            i += 1
+        ins = newins[:]
     if line == "" :
         pass
     else:
