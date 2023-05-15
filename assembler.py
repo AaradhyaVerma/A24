@@ -258,4 +258,3 @@ def halt_print(instruction):
     opcodestr = returnbin(instruction_code['hlt'], 5)
     printable = opcodestr + "00000000000"
     print(printable)
-halt_print("hlt")
