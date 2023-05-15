@@ -1,6 +1,5 @@
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6, "FLAGS":7}
 mem_bin = {}
-label_lst = []
 
 #creating a decimal to binary converter which takes the decimal and the number of bits as input
 def returnbin(num,bits):
@@ -525,25 +524,14 @@ f = open("test.txt",'r')
 for line in f:
     count += 1
     ins = line
-    newins = ""
     temp = line.split()
-    if ':' in line:
-        i = 0
-        strtmp = ""
-        while ins[i] != ':':
-            strtmp += ins[i]
-            i += 1
-        label_lst.append(strtmp)
-        i += 1
-        while(line[i] != '\n'):
-            newins += line[i]
-        newins = ins[:]
     if 'var' in temp:
         if(boolvarallowed == 0):
             s = "Var at inappropriate place"
             s += '\n'
             fout.write(s)
             break
+
         s = insert_var_in_dict(ins,addrcount)
         addrcount+=1 
         if s == "NULL":
@@ -554,7 +542,6 @@ for line in f:
             break
     else:
         boolvarallowed = 0
-    
     if haltcount != 0 and ins != '':
         fout.write("Halt found in the middle of instructions, program terminated\n")
         break
