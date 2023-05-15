@@ -516,7 +516,7 @@ for line in f:
     ins = line
     temp = line.split()
     if 'var' in temp:
-        s = insert_var_in_dict(ins)
+        s = insert_var_in_dict(ins,count)
         if s == "NULL":
             pass
         else:
