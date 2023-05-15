@@ -27,10 +27,10 @@ instruction_code = {'add':0,
          'not':13,
          'cmp':14,
          'jmp':15,
-         'jlt':16,
-         'jgt':17,
-         'je':18,
-         'hlt':19}
+         'jlt':28,
+         'jgt':29,
+         'je':31,
+         'hlt':26}
 
 # creating dicts for types
 types = {'add':"A",
