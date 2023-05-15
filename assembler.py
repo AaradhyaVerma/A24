@@ -91,7 +91,8 @@ def add_print(instruction):
         assert validity_check_register(temp_lst[i]) == True, "format of registers is invalid"
     opcode_str = returnbin(instruction_code['add'],5)
     print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def sub_print(instruction):
     global instruction_code 
@@ -106,7 +107,8 @@ def sub_print(instruction):
     opcodestr = returnbin(instruction_code['sub'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
-    print(printable)
+    # print(printable)
+    return printable
 
 def move_immediate(instruction):
     global instruction_code 
@@ -121,7 +123,8 @@ def move_immediate(instruction):
     assert imm >= 0 and imm <= 127, "Immediate value out of range"
     opcodestr = returnbin(instruction_code['mov_imm'], 5)
     printable = opcodestr +"0"+ returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 7)
-    print(printable)
+    # print(printable)
+    return printable
 
 def move_register(instruction):
     global instruction_code
@@ -135,7 +138,8 @@ def move_register(instruction):
     dest_reg_bin = returnbin(dest_reg, 3)
     src_reg_bin = returnbin(src_reg, 3)
     final_inst = returnbin(instruction_code['mov_reg'], 5) + "00000" + dest_reg_bin + src_reg_bin
-    print(final_inst)
+    # print(final_inst)
+    return final_inst
 
 def ld_print(instruction):
     global instruction_code
@@ -146,7 +150,8 @@ def ld_print(instruction):
     assert validity_check_mem_address(temp_lst[2]) == True, "memory address is invalid"
     opcode_str = returnbin(instruction_code['ld'],5)
     print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def st_print(instruction):
     temp_lst = instruction.split()
@@ -155,7 +160,8 @@ def st_print(instruction):
     assert validity_check_register(temp_lst[1]) == True, "register is invalid"
     opcode_str = returnbin(instruction_code['st'],5)
     print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def mul_print(instruction):
     global instruction_code 
@@ -170,7 +176,8 @@ def mul_print(instruction):
     opcodestr = returnbin(instruction_code['mul'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
-    print(printable)
+    # print(printable)
+    return printable
 
 def divide(instruction):
     global instruction_code
@@ -184,7 +191,8 @@ def divide(instruction):
     dest_reg_bin = returnbin(dest_reg, 3)
     src_reg_bin = returnbin(src_reg, 3)
     final_inst = returnbin(instruction_code['div'], 5) + "00000" + dest_reg_bin + src_reg_bin
-    print(final_inst)
+    # print(final_inst)
+    return final_inst
 
 def rs_print(instruction):
     global instruction_code
@@ -198,7 +206,8 @@ def rs_print(instruction):
     assert imm >= 0 and imm <= 127, "Immediate value out of range"
     opcode_str = returnbin(instruction_code['rs'],5)
     print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(imm, 7)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def ls_print(instruction):
     global instruction_code 
@@ -212,7 +221,8 @@ def ls_print(instruction):
     imm = int(imm)
     opcode_str = returnbin(instruction_code['ls'],5)
     print_machine_code = opcode_str + "0" + returnbin(reg_bin[templst[1]], 3) + returnbin(imm,7)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def xor_print(instruction):
     global instruction_code 
@@ -227,7 +237,8 @@ def xor_print(instruction):
     opcodestr = returnbin(instruction_code['xor'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
-    print(printable)
+    # print(printable)
+    return printable
 
 def Or(instruction):
     global instruction_code
@@ -246,7 +257,8 @@ def Or(instruction):
     src_reg2_bin = returnbin(src_reg2, 3)
 
     final_inst = returnbin(instruction_code['or'], 5) + "00" + dest_reg_bin + src_reg1_bin + src_reg2_bin
-    print(final_inst)
+    # print(final_inst)
+    return final_inst
 
 def and_print(instruction):
     global instruction_code
@@ -258,7 +270,8 @@ def and_print(instruction):
         assert validity_check_register(temp_lst[i]) == True, "format of registers is invalid"
     opcode_str = returnbin(instruction_code['and'],5)
     print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
-    print(print_machine_code)
+    # print(print_machine_code)
+    return print_machine_code
 
 def invert_print(instruction):
     global instruction_code
@@ -272,7 +285,8 @@ def invert_print(instruction):
     dest_reg_bin = returnbin(dest_reg, 3)
     src_reg_bin = returnbin(src_reg, 3)
     final_inst = returnbin(instruction_code['not'], 5) + "00000" + dest_reg_bin + src_reg_bin
-    print(final_inst)
+    # print(final_inst)
+    return final_inst
 
 def compare_print(instruction):
     global instruction_code 
@@ -287,7 +301,8 @@ def compare_print(instruction):
     opcodestr = returnbin(instruction_code['cmp'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00000" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)
-    print(printable)
+    # print(printable)
+    return printable
 
 def unconditional_jump(instruction):
     global instruction_code
@@ -296,7 +311,8 @@ def unconditional_jump(instruction):
     assert validity_check_opcode(lst[0]) == True, "Invalid instruction"
     assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
     final_inst = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
-    print(final_inst)
+    # print(final_inst)
+    return final_inst
 
 def jlt_print(instruction):
     global instruction_code
@@ -306,8 +322,8 @@ def jlt_print(instruction):
     assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
     opcode_str = returnbin(instruction_code['jlt'],5)
     print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
-    print(print_machine_code)
-
+    # print(print_machine_code)
+    return print_machine_code
 
 def jgt_print(instruction):
     global instruction_code
@@ -319,7 +335,8 @@ def jgt_print(instruction):
     assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
     opcodestr = returnbin(instruction_code['jgt'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
-    print(printable)
+    # print(printable)
+    return printable
 
 def je_print(instruction):
     global instruction_code
@@ -331,7 +348,8 @@ def je_print(instruction):
     assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
     opcodestr = returnbin(instruction_code['je'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
-    print(printable)
+    # print(printable)
+    return printable
 
 def halt_print(instruction):
     global instruction_code
@@ -340,4 +358,5 @@ def halt_print(instruction):
     assert len(instruction.split()) == 1, "number of args in halt instruction is invalid"
     opcodestr = returnbin(instruction_code['hlt'], 5)
     printable = opcodestr + "00000000000"
-    print(printable)
+    # print(printable)
+    return printable
