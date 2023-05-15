@@ -4,10 +4,8 @@ reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6}
 #creating a decimal to binary converter which takes the decimal and the number of bits as input
 def returnbin(num,bits):
     s = bin(num)
-    s = s[2:]
-    if(len(s) > bits):
-        print("number cannot be represented in given number of bits")
-        return
+    s = s[2:] 
+    assert(len(s) < bits),"number cannot be represented in given number of bits"
     for i in range(bits - len(s)):
         s = '0' + s
     return s
@@ -55,3 +53,26 @@ types = {'add':"A",
          'jgt':"E",
          'je':"E",
          'hlt':"F"}
+
+var_dict = {}
+#function for inserting vars in dict which takes line number, name as input
+def insert_var_in_dict(name,line_num):
+    global var_dict
+    var_dict[name] = returnbin(line_num,16)
+
+def validity_check_opcode(opcode):
+    global instruction_code
+    if opcode in instruction_code:
+        return True
+    else:
+        return False
+
+def sub_print(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    assert len(templst) == 4, "number of args in subtract instruction is invalid"
+    opcodestr = returnbin(instruction_code['sub'],5)
+    #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
+    printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
+    print(printable)
