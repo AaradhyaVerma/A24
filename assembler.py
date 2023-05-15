@@ -498,3 +498,100 @@ def halt_print(instruction):
     print_machine_code = opcodestr + "00000000000"
     # print(print_machine_code)
     return print_machine_code
+
+
+#reading input from test.txt
+f = open("test.txt",'r')
+#opening out.txt
+fout = open("out.txt",'a')
+fout.write("ASSEMBLY OUTPUT\n")
+haltcount = 0
+for line in f:
+    ins = line
+    if haltcount != 0 and ins != '':
+        fout.write("Halt found in the middle of instructions, program terminated\n")
+        break
+    command = ins.split()[0]
+    if 'FLAGS' in ins.split() and command != 'mov':
+        fout.write("Invalid Usage of Flags with instruction other than move\n")
+        break
+    if command == 'add':
+        s = add_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'sub':
+        s = sub_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'mov':
+        if '$' in ins:
+            s  = move_immediate(ins)
+            s += '\n'
+            fout.write(s)
+        else:
+            s = move_register(ins)
+            s += '\n'
+            fout.write(s)
+    elif command == 'ld':
+        s = ld_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'st':
+        s = st_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'mul':
+        s = mul_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'div':
+        s = divide(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'rs':
+        s = rs_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'xor':
+        s = xor_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'or':
+        s = or_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'and':
+        s = and_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'not':
+        s = invert_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'cmp':
+        s = compare_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'jmp':
+        s = unconditional_jump(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'jlt':
+        s = jlt_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'jgt':
+        s = jgt_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'je':
+        s = je_print(ins)
+        s += '\n'
+        fout.write(s)
+    elif command == 'hlt':
+        haltcount += 1
+        s = halt_print(ins)
+        s += '\n'
+        fout.write(s)    
+    
+        
