@@ -73,6 +73,15 @@ def validity_check_register(register):
         return True
     else:
         return False
+    
+def validity_check_mem_address(mem_addr):
+    try:
+        address = int(mem_addr)
+        if 0 <= address <= 127:
+            return True
+    except ValueError:
+        pass
+    return False
 
 def sub_print(instruction):
     global instruction_code 
