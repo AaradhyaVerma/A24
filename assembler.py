@@ -1,11 +1,11 @@
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6}
-
+mem_bin = {"label0": 0, "label1": 1, "label2": 2, "label3": 3, "label4": 4, "label5": 5, "label6": 6}
 
 #creating a decimal to binary converter which takes the decimal and the number of bits as input
 def returnbin(num,bits):
     s = bin(num)
     s = s[2:] 
-    assert(len(s) < bits),"number cannot be represented in given number of bits"
+    assert(len(s) <= bits),"number cannot be represented in given number of bits"
     for i in range(bits - len(s)):
         s = '0' + s
     return s
@@ -66,13 +66,58 @@ def validity_check_opcode(opcode):
         return True
     else:
         return False
+    
+def validity_check_register(register):
+    global reg_bin
+    if register in reg_bin:
+        return True
+    else:
+        return False
+    
+def validity_check_mem_address(mem_addr):
+    try:
+        address = int(mem_addr)
+        if 0 <= address <= 127:
+            return True
+    except ValueError:
+        pass
+    return False
+
+def add_print(instruction):
+    global instruction_code
+    #checking validity
+    temp_lst = instruction.split()
+    assert (validity_check_opcode(temp_lst[0]) == True), "Invalid instruction"
+    assert len(temp_lst) == 4, "number of arguments in addition instruction is invalid"
+    for i in range(1,4):
+        assert validity_check_register(temp_lst[i]) == True, "format of registers is invalid"
+    opcode_str = returnbin(instruction_code['add'],5)
+    print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
+    print(print_machine_code)
 
 def sub_print(instruction):
     global instruction_code 
     #checking validity
     templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
     assert len(templst) == 4, "number of args in subtract instruction is invalid"
+    j = 1
+    for i in range(3):
+        assert validity_check_register(templst[j]) == True, "invalid register"
+        j+=1
     opcodestr = returnbin(instruction_code['sub'],5)
     #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
     print(printable)
+
+def and_print(instruction):
+    global instruction_code
+    #checking validity
+    temp_lst = instruction.split()
+    assert (validity_check_opcode(temp_lst[0]) == True), "Invalid instruction"
+    assert len(temp_lst) == 4, "number of arguments in logical-and instruction is invalid"
+    for i in range(1,4):
+        assert validity_check_register(temp_lst[i]) == True, "format of registers is invalid"
+    opcode_str = returnbin(instruction_code['and'],5)
+    print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
+    print(print_machine_code)
