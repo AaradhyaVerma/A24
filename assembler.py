@@ -85,10 +85,16 @@ def add_print(instruction):
     global instruction_code
     #checking validity
     temp_lst = instruction.split()
-    assert (validity_check_opcode(temp_lst[0]) == True), "Invalid instruction"
-    assert len(temp_lst) == 4, "number of arguments in addition instruction is invalid"
+    if validity_check_opcode(temp_lst[0]) == False:
+        s = "Invalid instruction"
+        return s
+    if len(temp_lst) != 4:
+        s="number of arguments in addition instruction is invalid"
+        return s
     for i in range(1,4):
-        assert validity_check_register(temp_lst[i]) == True, "format of registers is invalid"
+        if validity_check_register(temp_lst[i]) == False:
+            s="format of registers is invalid"
+            return s
     opcode_str = returnbin(instruction_code['add'],5)
     print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
     # print(print_machine_code)
