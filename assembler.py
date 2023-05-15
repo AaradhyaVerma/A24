@@ -248,3 +248,14 @@ def je_print(instruction):
     opcodestr = returnbin(instruction_code['je'], 5)
     printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
     print(printable)
+
+def halt_print(instruction):
+    global instruction_code
+    # Checking validity
+    assert validity_check_opcode(instruction) == True, "invalid opcode"
+    assert len(instruction.split()) == 1, "number of args in halt instruction is invalid"
+    
+    opcodestr = returnbin(instruction_code['hlt'], 5)
+    printable = opcodestr + "00000000000"
+    print(printable)
+halt_print("hlt")
