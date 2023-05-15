@@ -517,9 +517,12 @@ count = 0
 addrcount = 0
 varcount = 0
 for line in f:
-    ins = line.split()
-    if ins[0] in instruction_code or ins[0] == 'mov':
-        addrcount += 1
+    if ins == "" :
+        pass
+    else:
+        ins = line.split()
+        if ins[0] in instruction_code or ins[0] == 'mov':
+            addrcount += 1
 f.close()
 f = open("test.txt",'r')
 for line in f:
