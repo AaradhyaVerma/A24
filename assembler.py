@@ -75,13 +75,11 @@ def validity_check_register(register):
         return False
     
 def validity_check_mem_address(mem_addr):
-    try:
-        address = int(mem_addr)
-        if 0 <= address <= 127:
-            return True
-    except ValueError:
-        pass
-    return False
+    global mem_bin
+    if mem_addr in mem_bin:
+        return True
+    else:
+        return False
 
 def add_print(instruction):
     global instruction_code
@@ -110,6 +108,51 @@ def sub_print(instruction):
     printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
     print(printable)
 
+def move_immediate(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    assert len(templst) == 3, "number of args in move imm instruction is invalid"
+    assert validity_check_register(templst[1]) == True, "invalid register"
+    imm=templst[2]
+    imm = imm[1:]
+    imm = int(imm)
+    assert imm >= 0 and imm <= 127, "Immediate value out of range"
+    opcodestr = returnbin(instruction_code['mov_imm'], 5)
+    printable = opcodestr +"0"+ returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 7)
+    print(printable)
+
+def mul_print(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    assert len(templst) == 4, "number of args in multiply instruction is invalid"
+    j = 1
+    for i in range(3):
+        assert validity_check_register(templst[j]) == True, "invalid register"
+        j+=1
+    opcodestr = returnbin(instruction_code['mul'],5)
+    #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
+    printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
+    print(printable)
+
+def xor_print(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    assert len(templst) == 4, "number of args in XOR instruction is invalid"
+    j = 1
+    for i in range(3):
+        assert validity_check_register(templst[j]) == True, "invalid register"
+        j+=1
+    opcodestr = returnbin(instruction_code['xor'],5)
+    #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
+    printable = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
+    print(printable)
+
 def and_print(instruction):
     global instruction_code
     #checking validity
@@ -121,3 +164,31 @@ def and_print(instruction):
     opcode_str = returnbin(instruction_code['and'],5)
     print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
     print(print_machine_code)
+
+def compare_print(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    assert len(templst) == 3, "number of args in compare instruction is invalid"
+    j = 1
+    for i in range(2):
+        assert validity_check_register(templst[j]) == True, "invalid register"
+        j+=1
+    opcodestr = returnbin(instruction_code['cmp'],5)
+    #printable = printable  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
+    printable = opcodestr + "00000" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)
+    print(printable)
+
+def je_print(instruction):
+    global instruction_code
+    # Checking validity
+    templst = instruction.split()
+    assert validity_check_opcode(templst[0]) == True, "invalid opcode"
+    assert len(templst) == 2, "number of args in jump if equal instruction is invalid"
+    mem_addr = templst[1]
+    assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
+
+    opcodestr = returnbin(instruction_code['je'], 5)
+    printable = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
+    print(printable)
