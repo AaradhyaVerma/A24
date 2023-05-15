@@ -525,10 +525,12 @@ for line in f:
         fout.write(s)
     elif command == 'mov':
         if '$' in ins:
+            ins = ins.replace('mov', 'mov_imm')
             s  = move_immediate(ins)
             s += '\n'
             fout.write(s)
         else:
+            ins = ins.replace('mov','mov_reg')
             s = move_register(ins)
             s += '\n'
             fout.write(s)
@@ -593,5 +595,5 @@ for line in f:
         s = halt_print(ins)
         s += '\n'
         fout.write(s)    
-    
-        
+f.close()
+fout.close()
