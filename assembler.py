@@ -1,3 +1,5 @@
+import sys
+
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6, "FLAGS":7}
 mem_bin = {}
 label_lst = []
@@ -510,9 +512,9 @@ def halt_print(instruction):
 boolvarallowed = 1
 
 #reading input from test.txt
-f = open("test.txt",'r')
+#f = open("test.txt",'r')
 #opening out.txt
-fout = open("out.txt",'a')
+#fout = open("out.txt",'a')
 haltcount = 0
 count = 0
 addrcount = 0
@@ -539,9 +541,10 @@ for line in f:
         ins = line.split()
         if ins[0] in instruction_code or ins[0] == 'mov':
             addrcount += 1
-f.close()
-f = open("test.txt",'r')
-for line in f:
+#f.close()
+#f = open("test.txt",'r')
+lines = sys.stdin.readlines()
+for line in lines:
     count += 1
     ins = line
     newins = ""
@@ -562,7 +565,7 @@ for line in f:
         if(boolvarallowed == 0):
             s = "Var at inappropriate place"
             s += '\n'
-            fout.write(s)
+            sys.stdout.write(s)
             break
         s = insert_var_in_dict(ins,addrcount)
         addrcount+=1 
@@ -576,93 +579,93 @@ for line in f:
         boolvarallowed = 0
     
     if haltcount != 0 and ins != '':
-        fout.write("Halt found in the middle of instructions, program terminated\n")
+        sys.stdout.write("Halt found in the middle of instructions, program terminated\n")
         break
     command = ins.split()[0]
 
     if 'FLAGS' in ins.split() and command != 'mov':
-        fout.write("Invalid Usage of Flags with instruction other than move\n")
+        sys.stdout.write("Invalid Usage of Flags with instruction other than move\n")
         break
 
     if command == 'add':
         s = add_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'sub':
         s = sub_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'mov':
         if '$' in ins:
             ins = ins.replace('mov', 'mov_imm')
             s  = move_immediate(ins)
             s += '\n'
-            fout.write(s)
+            sys.stdout.write(s)
         else:
             ins = ins.replace('mov','mov_reg')
             s = move_register(ins)
             s += '\n'
-            fout.write(s)
+            sys.stdout.write(s)
     elif command == 'ld':
         s = ld_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'st':
         s = st_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'mul':
         s = mul_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'div':
         s = divide(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'rs':
         s = rs_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'xor':
         s = xor_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'or':
         s = or_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'and':
         s = and_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'not':
         s = invert_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'cmp':
         s = compare_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'jmp':
         s = unconditional_jump(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'jlt':
         s = jlt_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'jgt':
         s = jgt_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'je':
         s = je_print(ins)
         s += '\n'
-        fout.write(s)
+        sys.stdout.write(s)
     elif command == 'hlt':
         haltcount += 1
         s = halt_print(ins)
         s += '\n'
-        fout.write(s)   
-f.close()
-fout.close()
+        sys.stdout.write(s)   
+#f.close()
+#fout.close()
