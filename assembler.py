@@ -519,7 +519,8 @@ haltcount = 0
 count = 0
 addrcount = 0
 varcount = 0
-for line in f:
+lines = sys.stdin.readlines()
+for line in lines:
     ins = line
     newins = ""
     temp = line.split()
@@ -543,7 +544,6 @@ for line in f:
             addrcount += 1
 #f.close()
 #f = open("test.txt",'r')
-lines = sys.stdin.readlines()
 for line in lines:
     count += 1
     ins = line
@@ -573,7 +573,7 @@ for line in lines:
             pass
         else:
             s += '\n'
-            fout.write(s)
+            sys.stdout.write(s)
             break
     else:
         boolvarallowed = 0
