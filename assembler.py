@@ -1,8 +1,16 @@
+import sys
+
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6, "FLAGS":7}
 mem_bin = {}
-label_lst = []
 
-#creating a decimal to binary converter which takes the decimal and the number of bits as input
+#key is mem addr, value is instruction
+insdict = {}
+
+#label,var => key is var/label and value is memory address 
+label_dict = {}
+vardictionary = {}
+
+#creating a decimal to binary converter which takes the decimal and the number of bits as input\
 def returnbin(num,bits):
     s = bin(num)
     s = s[2:] 
@@ -57,15 +65,6 @@ types = {'add':"A",
 
 
 #function for inserting vars in dict which takes line number, name as input
-def insert_var_in_dict(instruction, linecount):
-    global mem_bin
-    templst = instruction.split()
-    if len(templst) != 2:
-        s = "number of args not valid"
-        return s
-    mem_bin[templst[1]] = linecount
-    return "NULL"
-
 def validity_check_opcode(opcode):
     global instruction_code
     if opcode in instruction_code:
@@ -185,11 +184,11 @@ def ld_print(instruction):
     if validity_check_register(temp_lst[1]) == False:
         s = "Invalid register"
         return s
-    if validity_check_mem_address(temp_lst[2]) == False:
-        s = "Invalid memory address"
+    if temp_lst[2] not in vardictionary:
+        s = "var error"
         return s
     opcode_str = returnbin(instruction_code['ld'],5)
-    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(vardictionary[temp_lst[2]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -204,8 +203,11 @@ def st_print(instruction):
     if validity_check_register(temp_lst[1]) == False:
         s = "Invalid register"
         return s
+    if temp_lst[2] not in vardictionary:
+        s = "var error"
+        return s
     opcode_str = returnbin(instruction_code['st'],5)
-    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(vardictionary[temp_lst[2]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -418,10 +420,10 @@ def unconditional_jump(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
-    if lst[1] not in label_lst:
+    if lst[1] not in label_dict:
         s = "Label not found"
         return s
-    print_machine_code = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
+    print_machine_code = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(label_dict[lst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -437,16 +439,15 @@ def jlt_print(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
-    if temp_lst[1] not in label_lst:
+    if temp_lst[1] not in label_dict:
         s = "Label not found"
         return s
     opcode_str = returnbin(instruction_code['jlt'],5)
-    print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
+    print_machine_code = opcode_str + "0000" + returnbin(label_dict[temp_lst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
 def jgt_print(instruction):
-    print(instruction)
     global instruction_code
     # Checking validity
     templst = instruction.split()
@@ -460,11 +461,11 @@ def jgt_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if templst[1] not in label_lst:
+    if templst[1] not in label_dict:
         s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['jgt'], 5)
-    print_machine_code = opcodestr + "0000" + returnbin(7, 7)
+    print_machine_code = opcodestr + "0000" + returnbin(label_dict[templst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -482,11 +483,11 @@ def je_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if templst[1] not in label_lst:
+    if templst[1] not in label_dict:
         s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['je'], 5)
-    print_machine_code = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
+    print_machine_code = opcodestr + "0000" + returnbin(label_dict[templst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -507,82 +508,66 @@ def halt_print(instruction):
     print_machine_code = opcodestr + "00000000000"
     # print(print_machine_code)
     return print_machine_code
-boolvarallowed = 1
 
-#reading input from test.txt
-f = open("test.txt",'r')
-#opening out.txt
-fout = open("out.txt",'a')
-haltcount = 0
-count = 0
-addrcount = 0
+# reading input from test.txt
+# with open("assembly_code.txt",'r') as f:
+#     lines = f.read()
+
+lines = sys.stdin.read()
+lines = lines.split('\n')
+while '' in lines:
+    lines.remove('')
+
+halt = True
+inscount = 0
 varcount = 0
-for line in f:
+
+var_ok = True
+
+for line in lines:
+    if line[:3] == "var":
+        varcount+=1
+    else:
+        inscount += 1
+
+for i in range(varcount):
+    vardictionary[lines[i][4:]] = i+inscount
+
+for i in range(inscount):
+    l = lines[i+varcount]
+    if l[:3] == "var":
+        var_ok = False
+    if ":" in l:
+        temp = l.split()
+        label_dict[temp[0][:-1]] = i    
+        insdict[i] = " ".join(temp[1:])
+    else:
+        insdict[i] = l
+
+if list(insdict.values())[-1] != "hlt":
+    halt = False
+
+# fout = open("machine_code.txt",'w')
+fout = sys.stdout
+for line in insdict.values():
+    # print(line)
     ins = line
     newins = ""
     temp = line.split()
-    if ':' in line:
-        i = 0
-        strtmp = ""
-        while ins[i] != ':':
-            strtmp += ins[i]
-            i += 1
-        label_lst.append(strtmp)
-        i += 1
-        while(line[i] != '\n' and not line[i]):
-            newins += line[i]
-            i += 1
-        ins = newins[:]
-    if line == "" :
-        pass
-    else:
-        ins = line.split()
-        if ins[0] in instruction_code or ins[0] == 'mov':
-            addrcount += 1
-f.close()
-f = open("test.txt",'r')
-for line in f:
-    count += 1
-    ins = line
-    newins = ""
-    temp = line.split()
-    if ':' in line:
-        i = 0
-        strtmp = ""
-        while ins[i] != ':':
-            strtmp += ins[i]
-            i += 1
-        label_lst.append(strtmp)
-        i += 1
-        while(line[i] != '\n' ):
-            newins += line[i]
-            i += 1
-        ins = newins[:]
-    if 'var' in temp:
-        if(boolvarallowed == 0):
-            s = "Var at inappropriate place"
-            s += '\n'
-            fout.write(s)
-            break
-        s = insert_var_in_dict(ins,addrcount)
-        addrcount+=1 
-        if s == "NULL":
-            pass
-        else:
-            s += '\n'
-            fout.write(s)
-            break
-    else:
-        boolvarallowed = 0
+
+    if not var_ok:
+        fout.write("variables not all declared in the beginning\n")
+        break
     
-    if haltcount != 0 and ins != '':
+    if not halt:
         fout.write("Halt found in the middle of instructions, program terminated\n")
         break
-    command = ins.split()[0]
+    command = temp[0]
 
-    if 'FLAGS' in ins.split() and command != 'mov':
+    if 'FLAGS' in temp and (command != 'mov' or temp.index('FLAGS') == 1):
         fout.write("Invalid Usage of Flags with instruction other than move\n")
         break
+
 
     if command == 'add':
         s = add_print(ins)
@@ -660,9 +645,7 @@ for line in f:
         s += '\n'
         fout.write(s)
     elif command == 'hlt':
-        haltcount += 1
         s = halt_print(ins)
         s += '\n'
-        fout.write(s)   
-f.close()
-fout.close()
+        fout.write(s)
+# fout.close()
