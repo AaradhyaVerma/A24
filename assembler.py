@@ -39,7 +39,10 @@ instruction_code = {'add':0,
          'jlt':28,
          'jgt':29,
          'je':31,
-         'hlt':26}
+         'hlt':26,
+         'addf':16,
+         'subf':17,
+         'movf':18}
 
 # creating dicts for types
 types = {'add':"A",
@@ -61,7 +64,10 @@ types = {'add':"A",
          'jlt':"E",
          'jgt':"E",
          'je':"E",
-         'hlt':"F"}
+         'hlt':"F",
+         'addf':"A",
+         'subf':"A",
+         'movf':"B"}
 
 
 #function for inserting vars in dict which takes line number, name as input
@@ -509,6 +515,72 @@ def halt_print(instruction):
     # print(print_machine_code)
     return print_machine_code
 
+def addf_print(instruction):
+    global instruction_code
+    #checking validity
+    temp_lst = instruction.split()
+    if validity_check_opcode(temp_lst[0]) == False:
+        s = "Invalid opcode"
+        return s
+    if len(temp_lst) != 4:
+        s = "Number of arguments in additionf instruction are invalid"
+        return s
+    for i in range(1,4):
+        if validity_check_register(temp_lst[i]) == False:
+            s = "Invalid registers"
+            return s
+    opcode_str = returnbin(instruction_code['addf'],5)
+    print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
+    # print(print_machine_code)
+    return print_machine_code
+
+def subf_print(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    if validity_check_opcode(templst[0]) == False:
+        s = "Invalid opcode"
+        return s
+    if len(templst) != 4:
+        s = "Number of arguments in subtraction instruction are invalid"
+        return s
+    j = 1
+    for i in range(3):
+        if validity_check_register(templst[j]) == False:
+            s = "Invalid register"
+            return s
+        j += 1
+    opcodestr = returnbin(instruction_code['subf'],5)
+    # print_machine_code = print_machine_code  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
+    print_machine_code = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
+    # print(print_machine_code)
+    return print_machine_code
+
+def movef_immediate(instruction):
+    global instruction_code 
+    #checking validity
+    templst = instruction.split()
+    if validity_check_opcode(templst[0]) == False:
+        s = "Invalid opcode"
+        return s
+    if len(templst) != 3:
+        s = "Number of arguments in move_immediate instruction are invalid"
+        return s
+    if validity_check_register(templst[1]) == False:
+        s = "Invalid register"
+        return s
+    imm = templst[2]
+    imm = imm[1:]
+    imm = int(imm)
+    if imm < 0 or imm > 127:
+        s = "Immediate value out of range"
+        return s
+    opcodestr = returnbin(instruction_code['movf_imm'], 5)
+    print_machine_code = opcodestr + returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 8)
+    # print(print_machine_code)
+    return print_machine_code
+
+
 # reading input from test.txt
 # with open("assembly_code.txt",'r') as f:
 #     lines = f.read()
@@ -644,6 +716,18 @@ for line in insdict.values():
         s = je_print(ins)
         s += '\n'
         fout.write(s)
+    elif command == 'addf':
+        s= addf_print(ins)
+        s += '\n'
+        sys.stdout.write(s)
+    elif command == 'subf':
+        s= subf_print(ins)
+        s += '\n'
+        sys.stdout.write(s)
+    elif command == 'movf':
+        s= movef_immediate(ins)
+        s += '\n'
+        sys.stdout.write(s)
     elif command == 'hlt':
         s = halt_print(ins)
         s += '\n'
