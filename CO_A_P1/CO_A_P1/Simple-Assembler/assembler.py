@@ -2,15 +2,9 @@ import sys
 
 reg_bin = {"R0": 0, "R1": 1, "R2": 2, "R3": 3, "R4": 4, "R5": 5, "R6": 6, "FLAGS":7}
 mem_bin = {}
+label_lst = []
 
-#key is mem addr, value is instruction
-insdict = {}
-
-#label,var => key is var/label and value is memory address 
-label_dict = {}
-vardictionary = {}
-
-#creating a decimal to binary converter which takes the decimal and the number of bits as input\
+#creating a decimal to binary converter which takes the decimal and the number of bits as input
 def returnbin(num,bits):
     s = bin(num)
     s = s[2:] 
@@ -39,10 +33,7 @@ instruction_code = {'add':0,
          'jlt':28,
          'jgt':29,
          'je':31,
-         'hlt':26,
-         'addf':16,
-         'subf':17,
-         'movf':18}
+         'hlt':26}
 
 # creating dicts for types
 types = {'add':"A",
@@ -64,13 +55,19 @@ types = {'add':"A",
          'jlt':"E",
          'jgt':"E",
          'je':"E",
-         'hlt':"F",
-         'addf':"A",
-         'subf':"A",
-         'movf':"B"}
+         'hlt':"F"}
 
 
 #function for inserting vars in dict which takes line number, name as input
+def insert_var_in_dict(instruction, linecount):
+    global mem_bin
+    templst = instruction.split()
+    if len(templst) != 2:
+        s = "number of args not valid"
+        return s
+    mem_bin[templst[1]] = linecount
+    return "NULL"
+
 def validity_check_opcode(opcode):
     global instruction_code
     if opcode in instruction_code:
@@ -190,11 +187,11 @@ def ld_print(instruction):
     if validity_check_register(temp_lst[1]) == False:
         s = "Invalid register"
         return s
-    if temp_lst[2] not in vardictionary:
-        s = "var error"
+    if validity_check_mem_address(temp_lst[2]) == False:
+        s = "Invalid memory address"
         return s
     opcode_str = returnbin(instruction_code['ld'],5)
-    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(vardictionary[temp_lst[2]], 7)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -209,11 +206,8 @@ def st_print(instruction):
     if validity_check_register(temp_lst[1]) == False:
         s = "Invalid register"
         return s
-    if temp_lst[2] not in vardictionary:
-        s = "var error"
-        return s
     opcode_str = returnbin(instruction_code['st'],5)
-    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(vardictionary[temp_lst[2]], 7)
+    print_machine_code = opcode_str + "0" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(mem_bin[temp_lst[2]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -426,10 +420,10 @@ def unconditional_jump(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(lst[1]) == True, "Invalid memory address"
-    if lst[1] not in label_dict:
+    if lst[1] not in label_lst:
         s = "Label not found"
         return s
-    print_machine_code = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(label_dict[lst[1]], 7)
+    print_machine_code = returnbin(instruction_code['jmp'],5) + "0000" + returnbin(mem_bin[lst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -445,15 +439,16 @@ def jlt_print(instruction):
         s = "Invalid opcode"
         return s
     # assert validity_check_mem_address(temp_lst[1]) == True, "Invalid memory address"
-    if temp_lst[1] not in label_dict:
+    if temp_lst[1] not in label_lst:
         s = "Label not found"
         return s
     opcode_str = returnbin(instruction_code['jlt'],5)
-    print_machine_code = opcode_str + "0000" + returnbin(label_dict[temp_lst[1]], 7)
+    print_machine_code = opcode_str + "0000" + returnbin(mem_bin[temp_lst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
 def jgt_print(instruction):
+    print(instruction)
     global instruction_code
     # Checking validity
     templst = instruction.split()
@@ -467,11 +462,11 @@ def jgt_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if templst[1] not in label_dict:
+    if templst[1] not in label_lst:
         s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['jgt'], 5)
-    print_machine_code = opcodestr + "0000" + returnbin(label_dict[templst[1]], 7)
+    print_machine_code = opcodestr + "0000" + returnbin(7, 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -489,11 +484,11 @@ def je_print(instruction):
         return s
     mem_addr = templst[1]
     # assert validity_check_mem_address(mem_addr) == True, "invalid memory address"
-    if templst[1] not in label_dict:
+    if templst[1] not in label_lst:
         s = "Label not found"
         return s
     opcodestr = returnbin(instruction_code['je'], 5)
-    print_machine_code = opcodestr + "0000" + returnbin(label_dict[templst[1]], 7)
+    print_machine_code = opcodestr + "0000" + returnbin(mem_bin[templst[1]], 7)
     # print(print_machine_code)
     return print_machine_code
 
@@ -514,74 +509,6 @@ def halt_print(instruction):
     print_machine_code = opcodestr + "00000000000"
     # print(print_machine_code)
     return print_machine_code
-
-def addf_print(instruction):
-    global instruction_code
-    #checking validity
-    temp_lst = instruction.split()
-    if validity_check_opcode(temp_lst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(temp_lst) != 4:
-        s = "Number of arguments in additionf instruction are invalid"
-        return s
-    for i in range(1,4):
-        if validity_check_register(temp_lst[i]) == False:
-            s = "Invalid registers"
-            return s
-    opcode_str = returnbin(instruction_code['addf'],5)
-    print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
-    # print(print_machine_code)
-    return print_machine_code
-
-def subf_print(instruction):
-    global instruction_code 
-    #checking validity
-    templst = instruction.split()
-    if validity_check_opcode(templst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(templst) != 4:
-        s = "Number of arguments in subtraction instruction are invalid"
-        return s
-    j = 1
-    for i in range(3):
-        if validity_check_register(templst[j]) == False:
-            s = "Invalid register"
-            return s
-        j += 1
-    opcodestr = returnbin(instruction_code['subf'],5)
-    # print_machine_code = print_machine_code  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
-    print_machine_code = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
-    # print(print_machine_code)
-    return print_machine_code
-
-def movef_immediate(instruction):
-    global instruction_code 
-    #checking validity
-    templst = instruction.split()
-    if validity_check_opcode(templst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(templst) != 3:
-        s = "Number of arguments in move_immediate instruction are invalid"
-        return s
-    if validity_check_register(templst[1]) == False:
-        s = "Invalid register"
-        return s
-    imm = templst[2]
-    imm = imm[1:]
-    imm = int(imm)
-    if imm < 0 or imm > 127:
-        s = "Immediate value out of range"
-        return s
-    opcodestr = returnbin(instruction_code['movf_imm'], 5)
-    print_machine_code = opcodestr + returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 8)
-    # print(print_machine_code)
-    return print_machine_code
-
-
-
 boolvarallowed = 1
 
 #reading input from test.txt
@@ -654,12 +581,11 @@ for line in lines:
     if haltcount != 0 and ins != '':
         sys.stdout.write("Halt found in the middle of instructions, program terminated\n")
         break
-    command = temp[0]
+    command = ins.split()[0]
 
     if 'FLAGS' in ins.split() and command != 'mov':
         sys.stdout.write("Invalid Usage of Flags with instruction other than move\n")
         break
-
 
     if command == 'add':
         s = add_print(ins)
@@ -736,21 +662,10 @@ for line in lines:
         s = je_print(ins)
         s += '\n'
         sys.stdout.write(s)
-    elif command == 'addf':
-        s= addf_print(ins)
-        s += '\n'
-        sys.stdout.write(s)
-    elif command == 'subf':
-        s= subf_print(ins)
-        s += '\n'
-        sys.stdout.write(s)
-    elif command == 'movf':
-        s= movef_immediate(ins)
-        s += '\n'
-        sys.stdout.write(s)
     elif command == 'hlt':
+        haltcount += 1
         s = halt_print(ins)
         s += '\n'
         sys.stdout.write(s)   
 #f.close()
-#fout.close()                             
+#fout.close()
