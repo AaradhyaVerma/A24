@@ -13,8 +13,8 @@ reg_type = {
     "111": FLAGS
 }
 
-inst_type={"A":["00000","00001","00110","01010","01011","01100"],
-           "B":["00010","01000","01001"],
+inst_type={"A":["00000","00001","00110","01010","01011","01100","10000","10001"],
+           "B":["00010","01000","01001","10010"],
            "C":["00011","00111","01101","01110"],
            "D":["00100","00101"],
            "E":["01111","11100","11101","11111"],
@@ -38,7 +38,7 @@ def binary_to_decimal(binary):
     return decimal
     
 
-def ieee_dec(ie):
+def ieee_to_decimal(ie):
     ie = str(ie)
     exp_bin = ie[:3]
     exp = int(exp_bin, 2)
@@ -47,7 +47,7 @@ def ieee_dec(ie):
     dec = int(wh_bin + bin, 2)
     return dec
 
-def dec_ieee(n):
+def decimal_to_ieee(n):
     global checker
     n = float(n)
     wh = int(n)
@@ -62,7 +62,7 @@ def dec_ieee(n):
         exp = "0"*(3-len(exp))+exp
         ans = str(exp) + bi[1:]
         ans = ans[:8]
-        if (ieee_dec(ans)!=n):
+        if (ieee_to_decimal(ans)!=n):
             checker=1
         return ans
 
@@ -102,13 +102,13 @@ def initialize():
         MEM[p] = t
         p += 1
 
-pc_temp=0
+program_counter=0
 halted=False
 
 orv=0
 
 def execute(instruction,x,y,cycle):
-    global pc_temp
+    global program_counter
     global halted
     global checker
     global orv
@@ -119,7 +119,7 @@ def execute(instruction,x,y,cycle):
             reg_type["111"]=8
             reg_type[instruction[4]]=reg_type[instruction[4]]%16384
             orv=1
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["A"][1]:
         reg_type[instruction[4]]=reg_type[instruction[2]]-reg_type[instruction[3]]
@@ -127,7 +127,7 @@ def execute(instruction,x,y,cycle):
             reg_type["111"]=8
             reg_type[instruction[4]]=reg_type[instruction[4]]%16384
             orv=1
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["A"][2]:
         reg_type[instruction[4]]=reg_type[instruction[2]]*reg_type[instruction[3]]
@@ -135,43 +135,67 @@ def execute(instruction,x,y,cycle):
             reg_type["111"]=8
             reg_type[instruction[4]]=reg_type[instruction[4]]%16384
             orv=1
-        pc_temp+=1
+        program_counter+=1
     if op==inst_type["A"][3]:
         reg_type[instruction[4]]=reg_type[instruction[2]]^reg_type[instruction[3]]
-        pc_temp+=1
+        program_counter+=1
     
     if op==inst_type["A"][4]:
         reg_type[instruction[4]]=reg_type[instruction[2]]|reg_type[instruction[3]]
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["A"][5]:
         reg_type[instruction[4]]=reg_type[instruction[2]]&reg_type[instruction[3]]
-        pc_temp+=1
+        program_counter+=1
+
+    if op==inst_type["A"][6]:
+        reg_type[instruction[4]]=reg_type[instruction[2]]+reg_type[instruction[3]]
+        decimal_to_ieee(reg_type[instruction[4]])
+        if(checker==1):
+            reg_type["111"]=8
+            reg_type[instruction[4]]=128.0
+            checker=0
+            orv=1
+        program_counter+=1
+
+    if op==inst_type["A"][7]:
+        reg_type[instruction[4]]=reg_type[instruction[2]]-reg_type[instruction[3]]
+        decimal_to_ieee(reg_type[instruction[4]])
+        if(checker==1):
+            reg_type["111"]=8
+            reg_type[instruction[4]]=0
+            checker=0
+            orv=1
+        program_counter+=1
                 
     if op==inst_type["B"][0]:
         reg_type[instruction[1]]=binary_to_decimal(instruction[2])
-        pc_temp+=1
+        program_counter+=1
     
     if op==inst_type["B"][1]:
         reg_type[instruction[1]]=reg_type[instruction[1]]>>binary_to_decimal(instruction[2])
-        pc_temp+=1
+        program_counter+=1
     
     if op==inst_type["B"][2]:
         reg_type[instruction[1]]=reg_type[instruction[1]]<<binary_to_decimal(instruction[2])
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["C"][0]:
         reg_type[instruction[3]]=reg_type[instruction[2]]
+        program_counter+=1
+
+    if op==inst_type["B"][3]:
+        reg_type[instruction[1]]=ieee_to_decimal(instruction[2])
         pc_temp+=1
 
     if op==inst_type["C"][1]:
         reg_type["000"]=reg_type[instruction[2]]//reg_type[instruction[3]]
         reg_type["001"]=reg_type[instruction[2]]%reg_type[instruction[3]]
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["C"][2]:
         reg_type[instruction[3]]=~reg_type[instruction[2]]
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["C"][3]:
         if(reg_type[instruction[2]]<reg_type[instruction[3]]):
@@ -180,14 +204,14 @@ def execute(instruction,x,y,cycle):
             reg_type["111"]=2
         if(reg_type[instruction[2]]==reg_type[instruction[3]]):
             reg_type["111"]=1
-        pc_temp+=1
+        program_counter+=1
         orv=1
 
     if op==inst_type["D"][0]:
         x.append(cycle)
         y.append(binary_to_decimal(instruction[2]))
         reg_type[instruction[1]]=binary_to_decimal(MEM[binary_to_decimal(instruction[2])])
-        pc_temp+=1
+        program_counter+=1
 
     
     if op==inst_type["D"][1]:
@@ -196,32 +220,32 @@ def execute(instruction,x,y,cycle):
         t=decimal_to_binary(reg_type[instruction[1]])
         a=16-len(t)
         MEM[binary_to_decimal(instruction[2])]='0'*a+t
-        pc_temp+=1
+        program_counter+=1
 
     if op==inst_type["E"][0]:
-        pc_temp=binary_to_decimal(instruction[2])
+        program_counter=binary_to_decimal(instruction[2])
         
 
 
     if op==inst_type["E"][1]:
         if reg_type["111"]==4:
-            pc_temp=binary_to_decimal(instruction[2])
+            program_counter=binary_to_decimal(instruction[2])
         else:
-            pc_temp+=1
+            program_counter+=1
         
     
     if op==inst_type["E"][2]:
         if reg_type["111"]==2:
-            pc_temp=binary_to_decimal(instruction[2])
+            program_counter=binary_to_decimal(instruction[2])
         else:
-            pc_temp+=1
+            program_counter+=1
         
     
     if op==inst_type["E"][3]:
         if reg_type["111"]==1:
-            pc_temp=binary_to_decimal(instruction[2])
+            program_counter=binary_to_decimal(instruction[2])
         else:
-            pc_temp+=1
+            program_counter+=1
 
     if op==inst_type["F"][0]:
         halted=True
@@ -230,7 +254,7 @@ def execute(instruction,x,y,cycle):
         reg_type["111"]=0
     orv=0
 
-    return halted,pc_temp
+    return halted,program_counter
 
 
 initialize()
@@ -253,7 +277,7 @@ while(not halted):
     print(s,end=" ")
     for i in reg_type:
         if(type(reg_type[i])==float):
-            t=dec_ieee(reg_type[i])
+            t=decimal_to_ieee(reg_type[i])
         else:
             t=decimal_to_binary(reg_type[i])
         a=16-len(t)
