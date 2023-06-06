@@ -1,4 +1,3 @@
-from matplotlib import pyplot as plt
 import sys
 R0 = R1 = R2 = R3 = R4 = R5 = R6 = FLAGS = "0000000000000000"
 
@@ -295,3 +294,5 @@ for i in MEM:
         sys.stdout.write(s+'\n')
     else:
         sys.stdout.write(i+'\n')
+
+#bonus square, ones complement, double addition, LCM, HCF, 
