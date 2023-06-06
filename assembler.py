@@ -39,10 +39,7 @@ instruction_code = {'add':0,
          'jlt':28,
          'jgt':29,
          'je':31,
-         'hlt':26,
-         'addf':16,
-         'subf':17,
-         'movf':18}
+         'hlt':26}
 
 # creating dicts for types
 types = {'add':"A",
@@ -64,10 +61,7 @@ types = {'add':"A",
          'jlt':"E",
          'jgt':"E",
          'je':"E",
-         'hlt':"F",
-         'addf':"A",
-         'subf':"A",
-         'movf':"B"}
+         'hlt':"F"}
 
 
 #function for inserting vars in dict which takes line number, name as input
@@ -515,242 +509,143 @@ def halt_print(instruction):
     # print(print_machine_code)
     return print_machine_code
 
-def addf_print(instruction):
-    global instruction_code
-    #checking validity
-    temp_lst = instruction.split()
-    if validity_check_opcode(temp_lst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(temp_lst) != 4:
-        s = "Number of arguments in additionf instruction are invalid"
-        return s
-    for i in range(1,4):
-        if validity_check_register(temp_lst[i]) == False:
-            s = "Invalid registers"
-            return s
-    opcode_str = returnbin(instruction_code['addf'],5)
-    print_machine_code = opcode_str + "00" + returnbin(reg_bin[temp_lst[1]], 3) + returnbin(reg_bin[temp_lst[2]], 3) + returnbin(reg_bin[temp_lst[3]], 3)
-    # print(print_machine_code)
-    return print_machine_code
+# reading input from test.txt
+# with open("assembly_code.txt",'r') as f:
+#     lines = f.read()
 
-def subf_print(instruction):
-    global instruction_code 
-    #checking validity
-    templst = instruction.split()
-    if validity_check_opcode(templst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(templst) != 4:
-        s = "Number of arguments in subtraction instruction are invalid"
-        return s
-    j = 1
-    for i in range(3):
-        if validity_check_register(templst[j]) == False:
-            s = "Invalid register"
-            return s
-        j += 1
-    opcodestr = returnbin(instruction_code['subf'],5)
-    # print_machine_code = print_machine_code  + "00" + returnbin(reg_lst(templst[1]),3)+ returnbin(reg_lst(templst[2]),3)+ returnbin(reg_lst(templst[3]),3)
-    print_machine_code = opcodestr + "00" + returnbin(reg_bin[templst[1]],3)+returnbin(reg_bin[templst[2]],3)+returnbin(reg_bin[templst[3]],3)
-    # print(print_machine_code)
-    return print_machine_code
+lines = sys.stdin.read()
+lines = lines.split('\n')
+while '' in lines:
+    lines.remove('')
 
-def movef_immediate(instruction):
-    global instruction_code 
-    #checking validity
-    templst = instruction.split()
-    if validity_check_opcode(templst[0]) == False:
-        s = "Invalid opcode"
-        return s
-    if len(templst) != 3:
-        s = "Number of arguments in move_immediate instruction are invalid"
-        return s
-    if validity_check_register(templst[1]) == False:
-        s = "Invalid register"
-        return s
-    imm = templst[2]
-    imm = imm[1:]
-    imm = int(imm)
-    if imm < 0 or imm > 127:
-        s = "Immediate value out of range"
-        return s
-    opcodestr = returnbin(instruction_code['movf_imm'], 5)
-    print_machine_code = opcodestr + returnbin(reg_bin[templst[1]], 3) + returnbin(imm, 8)
-    # print(print_machine_code)
-    return print_machine_code
-
-
-
-boolvarallowed = 1
-
-#reading input from test.txt
-#f = open("test.txt",'r')
-#opening out.txt
-#fout = open("out.txt",'a')
-haltcount = 0
-count = 0
-addrcount = 0
+halt = True
+inscount = 0
 varcount = 0
-lines = sys.stdin.readlines()
+
+var_ok = True
+
 for line in lines:
+    if line[:3] == "var":
+        varcount+=1
+    else:
+        inscount += 1
+
+for i in range(varcount):
+    vardictionary[lines[i][4:]] = i+inscount
+
+for i in range(inscount):
+    l = lines[i+varcount]
+    if l[:3] == "var":
+        var_ok = False
+    if ":" in l:
+        temp = l.split()
+        label_dict[temp[0][:-1]] = i    
+        insdict[i] = " ".join(temp[1:])
+    else:
+        insdict[i] = l
+
+if list(insdict.values())[-1] != "hlt":
+    halt = False
+
+# fout = open("machine_code.txt",'w')
+fout = sys.stdout
+for line in insdict.values():
+    # print(line)
     ins = line
     newins = ""
     temp = line.split()
-    if ':' in line:
-        i = 0
-        strtmp = ""
-        while ins[i] != ':':
-            strtmp += ins[i]
-            i += 1
-        label_lst.append(strtmp)
-        i += 1
-        while(line[i] != '\n' and not line[i]):
-            newins += line[i]
-            i += 1
-        ins = newins[:]
-    if line == "" :
-        pass
-    else:
-        ins = line.split()
-        if ins[0] in instruction_code or ins[0] == 'mov':
-            addrcount += 1
-#f.close()
-#f = open("test.txt",'r')
-for line in lines:
-    count += 1
-    ins = line
-    newins = ""
-    temp = line.split()
-    if ':' in line:
-        i = 0
-        strtmp = ""
-        while ins[i] != ':':
-            strtmp += ins[i]
-            i += 1
-        label_lst.append(strtmp)
-        i += 1
-        while(line[i] != '\n' ):
-            newins += line[i]
-            i += 1
-        ins = newins[:]
-    if 'var' in temp:
-        if(boolvarallowed == 0):
-            s = "Var at inappropriate place"
-            s += '\n'
-            sys.stdout.write(s)
-            break
-        s = insert_var_in_dict(ins,addrcount)
-        addrcount+=1 
-        if s == "NULL":
-            pass
-        else:
-            s += '\n'
-            sys.stdout.write(s)
-            break
-    else:
-        boolvarallowed = 0
+
+    if not var_ok:
+        fout.write("variables not all declared in the beginning\n")
+        break
     
-    if haltcount != 0 and ins != '':
-        sys.stdout.write("Halt found in the middle of instructions, program terminated\n")
+    if not halt:
+        fout.write("Halt found in the middle of instructions, program terminated\n")
         break
     command = temp[0]
 
-    if 'FLAGS' in ins.split() and command != 'mov':
-        sys.stdout.write("Invalid Usage of Flags with instruction other than move\n")
+    if 'FLAGS' in temp and (command != 'mov' or temp.index('FLAGS') == 1):
+        fout.write("Invalid Usage of Flags with instruction other than move\n")
         break
 
 
     if command == 'add':
         s = add_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'sub':
         s = sub_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'mov':
         if '$' in ins:
             ins = ins.replace('mov', 'mov_imm')
             s  = move_immediate(ins)
             s += '\n'
-            sys.stdout.write(s)
+            fout.write(s)
         else:
             ins = ins.replace('mov','mov_reg')
             s = move_register(ins)
             s += '\n'
-            sys.stdout.write(s)
+            fout.write(s)
     elif command == 'ld':
         s = ld_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'st':
         s = st_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'mul':
         s = mul_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'div':
         s = divide(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'rs':
         s = rs_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'xor':
         s = xor_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'or':
         s = or_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'and':
         s = and_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'not':
         s = invert_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'cmp':
         s = compare_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'jmp':
         s = unconditional_jump(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'jlt':
         s = jlt_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'jgt':
         s = jgt_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'je':
         s = je_print(ins)
         s += '\n'
-        sys.stdout.write(s)
-    elif command == 'addf':
-        s= addf_print(ins)
-        s += '\n'
-        sys.stdout.write(s)
-    elif command == 'subf':
-        s= subf_print(ins)
-        s += '\n'
-        sys.stdout.write(s)
-    elif command == 'movf':
-        s= movef_immediate(ins)
-        s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'hlt':
         s = halt_print(ins)
         s += '\n'
-        sys.stdout.write(s)   
-#f.close()
-#fout.close()                             
+        fout.write(s)
+# fout.close()
