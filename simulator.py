@@ -29,13 +29,11 @@ def decimal_to_binary(num,bits):
         s = '0' + s
     return s
 
-
 def binary_to_decimal(binary):
     decimal = 0
     for digit in binary:
         decimal = decimal * 2 + int(digit)
     return decimal
-    
 
 def ieee_to_decimal(ie):
     ie = str(ie)

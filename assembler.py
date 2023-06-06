@@ -619,7 +619,7 @@ for i in range(inscount):
 if list(insdict.values())[-1] != "hlt":
     halt = False
 
-# fout = open("machine_code.txt",'w')
+#fout = open("machine_code.txt",'w')
 fout = sys.stdout
 for line in insdict.values():
     # print(line)
@@ -719,17 +719,17 @@ for line in insdict.values():
     elif command == 'addf':
         s= addf_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'subf':
         s= subf_print(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'movf':
         s= movef_immediate(ins)
         s += '\n'
-        sys.stdout.write(s)
+        fout.write(s)
     elif command == 'hlt':
         s = halt_print(ins)
         s += '\n'
         fout.write(s)
-# fout.close()
+fout.close()
