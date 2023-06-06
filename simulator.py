@@ -258,7 +258,6 @@ def execute(instruction,x,y,cycle):
 
 initialize()
 pc=0
-
 x=[]
 y=[]
 cycle=0
