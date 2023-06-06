@@ -1,5 +1,5 @@
 import sys
-R0 = R1 = R2 = R3 = R4 = R5 = R6 = FLAGS = "0000000000000000"
+R0 = R1 = R2 = R3 = R4 = R5 = R6 = FLAGS = 0000000000000000
 
 reg_type = {
     "000": R0,
@@ -69,6 +69,11 @@ lines=sim_inst.split("\n")
 if(lines[-1]==''):
     lines=lines[:-1]
 
+#read a file
+# with open("machine_code.txt",'r') as f:
+#     lines = f.read().split("\n")
+
+
 p=0
   
 def initialize():
@@ -81,23 +86,52 @@ def initialize():
             t.append(i[7:10])
             t.append(i[10:13])
             t.append(i[13:16])
+            MEM[p] = t
+            p += 1
         elif op in inst_type["B"]:
-            t.append(i[5:8])
-            t.append(i[8:16])
+            t.append(i[5:6])
+            t.append(i[6:9])
+            t.append(i[9:16])
+            MEM[p] = t
+            p += 1
         elif op in inst_type["C"]:
             t.append(i[5:10])
             t.append(i[10:13])
             t.append(i[13:16])
+            MEM[p] = t
+            p += 1
         elif op in inst_type["D"]:
-            t.append(i[5:8])
-            t.append(i[8:16])
+            t.append(i[5:6])
+            t.append(i[6:9])
+            t.append(i[9:16])
+            MEM[p] = t
+            p += 1
         elif op in inst_type["E"]:
-            t.append(i[5:8])
-            t.append(i[8:16])
+            t.append(i[6:10])
+            t.append(i[10:16])
+            MEM[p] = t
+            p += 1
         elif op in inst_type["F"]:
             t.append(i[5:16])
-        MEM[p] = t
-        p += 1
+            MEM[p] = t
+            p += 1
+
+def binarytodecimal(s):
+    l=len(s)
+    sum=0
+    for i in range(l):
+        sum+=int(s[i])*2**(l-1-i)
+
+    return sum
+
+def decimaltobinary(s):
+    s1=""
+    n=int(s)
+    while n>0:
+        s1+=str(n%2)
+        n=n//2
+    res=s1[::-1]
+    return res
 
 program_counter=0
 halted=False
@@ -166,15 +200,15 @@ def execute(instruction,x,y,cycle):
         program_counter+=1
                 
     if op==inst_type["B"][0]:
-        reg_type[instruction[1]]=binary_to_decimal(instruction[2])
+        reg_type[instruction[1]]=binarytodecimal(instruction[2])
         program_counter+=1
     
     if op==inst_type["B"][1]:
-        reg_type[instruction[1]]=reg_type[instruction[1]]>>binary_to_decimal(instruction[2])
+        reg_type[instruction[1]]=reg_type[instruction[1]]>>binarytodecimal(instruction[2])
         program_counter+=1
     
     if op==inst_type["B"][2]:
-        reg_type[instruction[1]]=reg_type[instruction[1]]<<binary_to_decimal(instruction[2])
+        reg_type[instruction[1]]=reg_type[instruction[1]]<<binarytodecimal(instruction[2])
         program_counter+=1
 
     if op==inst_type["C"][0]:
@@ -206,41 +240,41 @@ def execute(instruction,x,y,cycle):
 
     if op==inst_type["D"][0]:
         x.append(cycle)
-        y.append(binary_to_decimal(instruction[2]))
-        reg_type[instruction[1]]=binary_to_decimal(MEM[binary_to_decimal(instruction[2])])
+        y.append(binarytodecimal(instruction[2]))
+        reg_type[instruction[1]]=binarytodecimal(MEM[binarytodecimal(instruction[2])])
         program_counter+=1
 
     
     if op==inst_type["D"][1]:
         x.append(cycle)
-        y.append(binary_to_decimal(instruction[2]))
-        t=decimal_to_binary(reg_type[instruction[1]])
+        y.append(binarytodecimal(instruction[2]))
+        t=decimaltobinary(reg_type[instruction[1]])
         a=16-len(t)
-        MEM[binary_to_decimal(instruction[2])]='0'*a+t
+        MEM[binarytodecimal(instruction[2])]='0'*a+t
         program_counter+=1
 
     if op==inst_type["E"][0]:
-        program_counter=binary_to_decimal(instruction[2])
+        program_counter=binarytodecimal(instruction[2])
         
 
 
     if op==inst_type["E"][1]:
         if reg_type["111"]==4:
-            program_counter=binary_to_decimal(instruction[2])
+            program_counter=binarytodecimal(instruction[2])
         else:
             program_counter+=1
         
     
     if op==inst_type["E"][2]:
         if reg_type["111"]==2:
-            program_counter=binary_to_decimal(instruction[2])
+            program_counter=binarytodecimal(instruction[2])
         else:
             program_counter+=1
         
     
     if op==inst_type["E"][3]:
         if reg_type["111"]==1:
-            program_counter=binary_to_decimal(instruction[2])
+            program_counter=binarytodecimal(instruction[2])
         else:
             program_counter+=1
 
@@ -261,22 +295,22 @@ x=[]
 y=[]
 cycle=0
 
-
+#fout = open("final_code.txt",'w')
 while(not halted):
     x.append(cycle)
     y.append(pc)
     Instruction=MEM[pc]
     halted,new_pc=execute(Instruction,x,y,cycle)
-    t=decimal_to_binary(pc)
-    a=8-len(t)
+    t=decimaltobinary(pc)
+    a=16-len(t)
     s='0'*a+t
-    sys.stdout.write(s+' ')
+    sys.stdout.write(s+(' '*8))
     print(s,end=" ")
     for i in reg_type:
         if(type(reg_type[i])==float):
             t=decimal_to_ieee(reg_type[i])
         else:
-            t=decimal_to_binary(reg_type[i])
+            t=decimaltobinary(reg_type[i])
         a=16-len(t)
         s='0'*a+t
         sys.stdout.write(s+' ')
@@ -286,11 +320,9 @@ while(not halted):
     cycle+=1
 
 for i in MEM:
-    
     if type(i)==list:
         s=''.join(i)
         sys.stdout.write(s+'\n')
     else:
         sys.stdout.write(i+'\n')
 
-#bonus square, ones complement, double addition, LCM, HCF, 
